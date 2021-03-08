@@ -1,12 +1,12 @@
 function getCardHtml(url,title,body,repo){
-    return `<div class="card mt-2">
+    return `<div class="card mt-2 mb-2">
     <div class="card-header">
         ${repo}
     </div>
     <div class="card-body">
         <h5 class="card-title">${title}</h5>
         <p class="card-text">${body}</p>
-        <a href="${url}" class="btn btn-primary">Go somewhere</a>
+        <button onclick = "moreInfo('${url}')" class="btn btn-primary ">More Info</button>
     </div>
 </div>`;
 }
@@ -27,3 +27,7 @@ $("#pr_search").submit(function(event){
     })
 
 });
+
+function moreInfo(data){
+    console.log(data)
+}
