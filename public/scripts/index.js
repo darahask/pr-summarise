@@ -25,7 +25,6 @@ $("#pr_search").submit(function(event){
             $('#pr_list').html(cardHtml);
         }
     })
-
 });
 
 function moreInfo(data){
