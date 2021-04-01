@@ -5,7 +5,8 @@ function displayData(data){
     var html_url = data['html_url'];
     var card = `<div class="card mt-2 mb-2">
         <div class="card-header">
-            <a href="${html_url}">MoreInfo</a>
+            <a href="${html_url}">More_Info</a>
+            <a href="prinfo/code">&emsp; Code_Analysis</a>
         </div>
         <div class="card-body">
             <h5 class="card-title">${title}</h5>
@@ -46,6 +47,7 @@ function validateData(data){
 
 $(window).on('load',function(){
     var prurl = $('#prurl').attr('href');
+    console.log(prurl)
     $.get(prurl,function(data){
         displayData(data);
         validateData(data);

@@ -3,6 +3,7 @@ var app = express();
 var bodyparser = require('body-parser');
 var configstore = require('configstore');
 var validate = require("./logic/validate");
+var axios = require('axios');
 
 app.set("view engine", "ejs");
 app.use("/", express.static('public'));
@@ -39,6 +40,24 @@ app.post('/prrules',function(req,res){
 app.post('/prinfo/validate',(req,res)=>{
     var data = validate(store.get('prrule'),store.get('cmrule'),req.body.data);
     res.json(data);
+})
+
+app.get('/prinfo/code',(req,res)=>{
+    var data = [];
+    axios.get(store.get('url')).then(function(resp){
+        var commits_url = resp['data']['commits_url'];
+        axios.get(commits_url).then(function(commits){
+            commits['data'].forEach(commit => {
+                axios.get(commit['url']).then(function(files){
+                    files['data']['files'].forEach(file => {
+                        console.log(file['patch']);
+                        data.push(file['patch'])
+                    });
+                    res.render('codeinfo.ejs',{data:data});
+                })
+            });            
+        })
+    })
 })
 
 app.listen(3000, function (req, res) {
