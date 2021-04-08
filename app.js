@@ -4,6 +4,7 @@ var bodyparser = require('body-parser');
 var configstore = require('configstore');
 var validate = require("./logic/validate");
 var axios = require('axios');
+var similarity = require('./logic/similarity');
 
 app.set("view engine", "ejs");
 app.use("/", express.static('public'));
@@ -42,6 +43,11 @@ app.post('/prinfo/validate',(req,res)=>{
     res.json(data);
 })
 
+app.post('/prinfo/similarity',(req,res)=>{
+    var data = similarity(store.get('prrule'),store.get('cmrule'),req.body.data);
+    res.json(data);
+})
+
 app.get('/prinfo/code',(req,res)=>{
     var data = [];
     axios.get(store.get('url')).then(function(resp){
@@ -50,7 +56,6 @@ app.get('/prinfo/code',(req,res)=>{
             commits['data'].forEach(commit => {
                 axios.get(commit['url']).then(function(files){
                     files['data']['files'].forEach(file => {
-                        console.log(file['patch']);
                         data.push(file['patch'])
                     });
                     res.render('codeinfo.ejs',{data:data});

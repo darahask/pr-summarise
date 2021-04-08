@@ -5,8 +5,8 @@ function displayData(data){
     var html_url = data['html_url'];
     var card = `<div class="card mt-2 mb-2">
         <div class="card-header">
-            <a href="${html_url}">More_Info</a>
-            <a href="prinfo/code">&emsp; Code_Analysis</a>
+            <a href="${html_url}">More_Info</a><br>
+            <a href="prinfo/code">Code_Change_Analysis</a>
         </div>
         <div class="card-body">
             <h5 class="card-title">${title}</h5>
@@ -34,7 +34,7 @@ function fillData(data){
         <b>Added To Rule: </b>${element['added']}<br>
         <b>Removed From Rule: </b>${element['remove']}<br></li>`;
     });
-    $("#resval").html(myhtm);
+    $("#resval").append(myhtm);
 }
 
 function validateData(data){
@@ -45,11 +45,26 @@ function validateData(data){
     });
 }
 
+function fillSimilarity(data){
+    console.log(data)
+    var htm = `<b>Similarity with the guildelines: </b>${data*100} %`;
+    $("#simval").html(htm);
+}
+
+function findSimilarity(data){
+    var thedata = {};
+    thedata.data = data;
+    $.post('/prinfo/similarity',thedata).done(function(data){
+        fillSimilarity(data);
+    });
+}
+
 $(window).on('load',function(){
     var prurl = $('#prurl').attr('href');
     console.log(prurl)
     $.get(prurl,function(data){
         displayData(data);
+        findSimilarity(data);
         validateData(data);
     });
 });
