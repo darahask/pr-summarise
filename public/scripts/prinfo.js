@@ -46,7 +46,6 @@ function validateData(data){
 }
 
 function fillSimilarity(data){
-    console.log(data)
     var htm = `<b>Similarity with the guildelines: </b>${data*100} %`;
     $("#simval").html(htm);
 }

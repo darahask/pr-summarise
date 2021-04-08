@@ -49,6 +49,10 @@ app.post('/prinfo/similarity',(req,res)=>{
 })
 
 app.get('/prinfo/code',(req,res)=>{
+    res.render('codeinfo');
+});
+
+app.get('/prinfo/codeinfo',(req,res)=>{
     var data = [];
     axios.get(store.get('url')).then(function(resp){
         var commits_url = resp['data']['commits_url'];
@@ -56,9 +60,10 @@ app.get('/prinfo/code',(req,res)=>{
             commits['data'].forEach(commit => {
                 axios.get(commit['url']).then(function(files){
                     files['data']['files'].forEach(file => {
-                        data.push(file['patch'])
+                        data.push({patch:file['patch'],name:file['filename']})
                     });
-                    res.render('codeinfo.ejs',{data:data});
+                    console.log(data);
+                    res.json(data);
                 })
             });            
         })
