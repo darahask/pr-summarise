@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var bodyparser = require('body-parser');
+var bodyParser = require('body-parser');
 var configstore = require('configstore');
 var validate = require("./logic/validate");
 var axios = require('axios');
@@ -8,7 +8,7 @@ var similarity = require('./logic/similarity');
 
 app.set("view engine", "ejs");
 app.use("/", express.static('public'));
-app.use(bodyparser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const store = new configstore("Pr-Summariz");
 
@@ -17,58 +17,75 @@ app.get('/', function (req, res) {
 });
 
 app.post('/prinfo', function (req, res) {
-    store.set('url',req.body.url);
+    store.set('url', req.body.url);
+    store.set('fullname', req.body.fullname);
+    store.set('reponame', req.body.reponame);
     res.send('URL Loaded');
 });
 
-app.get('/prinfo',function(req,res){
+app.get('/prinfo', function (req, res) {
     var url = store.get('url');
-    res.render('prinfo',{url:url});
+    res.render('prinfo', { url: url });
 });
 
-app.get('/prrules',function(req,res){
+app.get('/prrules', function (req, res) {
     res.render('prrules');
 });
 
-app.post('/prrules',function(req,res){
+app.post('/prrules', function (req, res) {
     var prrule = req.body.prrule;
     var cmrule = req.body.cmrule;
-    store.set('prrule',prrule);
-    store.set('cmrule',cmrule);
+    store.set('prrule', prrule);
+    store.set('pkgrule', cmrule);
     res.redirect('/');
 });
 
-app.post('/prinfo/validate',(req,res)=>{
-    var data = validate(store.get('prrule'),store.get('cmrule'),req.body.data);
+app.post('/prinfo/validate', (req, res) => {
+    var data = validate(store.get('prrule'), req.body.data);
     res.json(data);
 })
 
-app.post('/prinfo/similarity',(req,res)=>{
-    var data = similarity(store.get('prrule'),store.get('cmrule'),req.body.data);
+app.post('/prinfo/similarity', (req, res) => {
+    var data = similarity(store.get('prrule'), req.body.data);
     res.json(data);
 })
 
-app.get('/prinfo/code',(req,res)=>{
+app.get('/prinfo/code', (req, res) => {
     res.render('codeinfo');
 });
 
-app.get('/prinfo/codeinfo',(req,res)=>{
+app.get('/prinfo/codeinfo', (req, res) => {
     var data = [];
-    axios.get(store.get('url')).then(function(resp){
+    axios.get(store.get('url')).then(function (resp) {
         var commits_url = resp['data']['commits_url'];
-        axios.get(commits_url).then(function(commits){
+        axios.get(commits_url).then(function (commits) {
             commits['data'].forEach(commit => {
-                axios.get(commit['url']).then(function(files){
+                axios.get(commit['url']).then(function (files) {
                     files['data']['files'].forEach(file => {
-                        data.push({patch:file['patch'],name:file['filename']})
+                        data.push({ patch: file['patch'], name: file['filename'] })
                     });
-                    console.log(data);
                     res.json(data);
-                })
-            });            
-        })
-    })
+                }).catch(()=>{});
+            });
+        }).catch(()=>{});
+    }).catch(()=>{});
 })
+
+app.get("/prinfo/pkgcheck", (req, res) => {
+    var baseurl = `https://raw.githubusercontent.com/${store.get('reponame')}${store.get('pkgrule')}`;
+    var headurl = `https://raw.githubusercontent.com/${store.get('fullname')}${store.get('pkgrule')}`;
+    console.log(baseurl);
+    axios.get(baseurl).then(function (resp) {
+        var basefile = resp['data'].toString();
+        axios.get(headurl).then(function (resp2) {
+            var headfile = resp2['data'].toString();
+            var data = {};
+            data.validation = validate(headfile,{body:headfile});
+            data.similarity = similarity(basefile,{body:headfile});
+            res.json(data);
+        }).catch((error)=>{console.log(error)});
+    }).catch(()=>{});
+});
 
 app.listen(3000, function (req, res) {
     console.log("Server Started");

@@ -1,8 +1,8 @@
 const Diff = require('diff');
 
-function validateData(prrule, cmrule, data) {
+function validateData(prrule,data) {
     var body = data['body'];
-    var prstat = Diff.diffLines(prrule,body,{ignoreWhitespace:true,newlineIsToken:true});
+    var prstat = Diff.diffLines(prrule,body,{ignoreWhitespace:true});
     return prstat;
 }
 
