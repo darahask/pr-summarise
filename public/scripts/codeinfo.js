@@ -14,15 +14,25 @@ function fillCode(data) {
     $('#code_main').append(htm);
 }
 
-function fillPkgAnalysis(data) {
-    var htm = `<b>Similarity with the guildelines: </b>${data.similarity * 100} %`;
-    $("#simcode").html(htm);
-    var myhtm = '';
-    data.validation.forEach(element => {
-        myhtm += `<li class="list-group-item"><b>Line: </b>${element['value']}<br>
-        <b>Added To Rule: </b>${element['added']}<br>
-        <b>Removed From Rule: </b>${element['remove']}<br></li>`;
-    });
+function fillPkgAnalysis(unit) {
+    var myhtm = "";
+    unit.forEach((data) => {
+        myhtm += `<li class="list-group-item active" id='simcode'><b>Similarity with the guildelines: </b>${data.similarity * 100} %<br>
+        <b>File Path: </b>${data.path}</li>`;
+        data.validation.forEach(element => {
+            myhtm += `<li class="list-group-item"><b>Line: </b>${element['value']}<br>`;
+            if (element['added'] != null) {
+                myhtm += `<b>Added To Rule: </b>${element['added']}<br></br>`;
+            }
+            if (element['remove'] != null) {
+                myhtm += `<b>Removed From Rule: </b>${element['remove']}<br></li>`;
+            }
+            if ((element['added'] != null) && (element['remove'] != null)) {
+                myhtm += `<b>Added To Rule: </b>${element['added']}<br></br>`;
+                myhtm += `<b>Removed From Rule: </b>${element['remove']}<br></li>`;
+            }
+        });
+    })
     $("#pkgcheck").append(myhtm);
 }
 
@@ -30,9 +40,7 @@ function startFetch() {
     $.get('/prinfo/codeinfo', function (data) {
         fillCode(data);
     });
-    console.log('went')
     $.get('/prinfo/pkgcheck', function (data) {
-        console.log('went')
         fillPkgAnalysis(data);
     });
 }

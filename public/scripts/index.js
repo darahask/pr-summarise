@@ -11,9 +11,20 @@ function getCardHtml(reponame,fullname, url, title, body, repo) {
 </div>`;
 }
 
+function moreInfo(data, fullname,reponame) {
+    var urldata = {};
+    urldata.url = data;
+    urldata.fullname = fullname;
+    urldata.reponame = reponame;
+    $.post('/prinfo', urldata).done(function (data) {
+        window.location.href = "/prinfo"
+    });
+}
+
 $("#pr_search").submit(function (event) {
     event.preventDefault();
     var search_url = "https://api.github.com/repos/" + $("#search_url").val() + "/pulls";
+    localStorage.setItem('search',$("#search_url").val());
     $.ajax({
         type: 'GET',
         url: search_url,
@@ -23,16 +34,15 @@ $("#pr_search").submit(function (event) {
                 cardHtml += getCardHtml(element['base']['repo']['full_name'], element['head']['repo']['full_name'], element['url'], element['title'], element['number'], element['base']['label'])
             });
             $('#pr_list').html(cardHtml);
+            localStorage.setItem("prs",cardHtml);
         }
     })
 });
 
-function moreInfo(data, fullname,reponame) {
-    var urldata = {};
-    urldata.url = data;
-    urldata.fullname = fullname;
-    urldata.reponame = reponame;
-    $.post('/prinfo', urldata).done(function (data) {
-        window.location.href = "/prinfo"
-    });
+window.onload = function(e){
+    var html = localStorage.getItem("prs");
+    document.getElementById('search_url').value = localStorage.getItem('search');
+    if(html != null){
+        $('#pr_list').html(html);
+    }
 }

@@ -14,8 +14,8 @@ function displayData(data){
         </div>
     </div>`
     $('#pr_main').append(card);
-    var md = window.markdownit();
-    var s = md.render(body);
+    var sd = new showdown.Converter();
+    var s = sd.makeHtml(body);
     $('#prbody').html(s);
     
     //setting up more info card
@@ -30,9 +30,17 @@ function displayData(data){
 function fillData(data){
     var myhtm = "";
     data.forEach(element => {
-        myhtm += `<li class="list-group-item"><b>Line: </b>${element['value']}<br>
-        <b>Added To Rule: </b>${element['added']}<br>
-        <b>Removed From Rule: </b>${element['remove']}<br></li>`;
+        myhtm += `<li class="list-group-item"><b>Line: </b>${element['value']}<br>`;
+        if(element['added'] != null){
+            myhtm += `<b>Added To Rule: </b>${element['added']}<br></br>`;
+        }
+        if(element['remove'] != null){
+            myhtm += `<b>Removed From Rule: </b>${element['remove']}<br></li>`;
+        }
+        if((element['added'] != null) && (element['remove'] != null)){
+            myhtm += `<b>Added To Rule: </b>${element['added']}<br></br>`;
+            myhtm += `<b>Removed From Rule: </b>${element['remove']}<br></li>`;
+        }
     });
     $("#resval").append(myhtm);
 }
@@ -60,7 +68,6 @@ function findSimilarity(data){
 
 $(window).on('load',function(){
     var prurl = $('#prurl').attr('href');
-    console.log(prurl)
     $.get(prurl,function(data){
         displayData(data);
         findSimilarity(data);

@@ -72,19 +72,28 @@ app.get('/prinfo/codeinfo', (req, res) => {
 })
 
 app.get("/prinfo/pkgcheck", (req, res) => {
-    var baseurl = `https://raw.githubusercontent.com/${store.get('reponame')}${store.get('pkgrule')}`;
-    var headurl = `https://raw.githubusercontent.com/${store.get('fullname')}${store.get('pkgrule')}`;
-    console.log(baseurl);
-    axios.get(baseurl).then(function (resp) {
-        var basefile = resp['data'].toString();
-        axios.get(headurl).then(function (resp2) {
-            var headfile = resp2['data'].toString();
-            var data = {};
-            data.validation = validate(headfile,{body:headfile});
-            data.similarity = similarity(basefile,{body:headfile});
-            res.json(data);
-        }).catch((error)=>{console.log(error)});
-    }).catch(()=>{});
+    var codedata = [];
+    var urls = store.get('pkgrule').split("\r\n");
+    urls.forEach((url)=>{
+        if(url === ''){
+            return;
+        }
+        var baseurl = `https://raw.githubusercontent.com/${store.get('reponame')}${url}`;
+        var headurl = `https://raw.githubusercontent.com/${store.get('fullname')}${url}`;
+        axios.get(baseurl).then(function (resp) {
+            var basefile = resp['data'].toString();
+            axios.get(headurl).then(function (resp2) {
+                var headfile = resp2['data'].toString();
+                var data = {}
+                data.validation = validate(headfile,{body:headfile});
+                data.similarity = similarity(basefile,{body:headfile});
+                data.path = url;
+                codedata.push(data);
+                store.set('codedata',codedata);
+            }).catch(()=>{});
+        }).catch(()=>{});
+    })
+    res.json(store.get('codedata'));
 });
 
 app.listen(3000, function (req, res) {
