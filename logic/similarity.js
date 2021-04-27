@@ -1,3 +1,4 @@
+//function to find similarity between two strings based on Dice's Coefficient which is better than Levenshtein distance.
 var similarity = require('string-similarity');
 
 

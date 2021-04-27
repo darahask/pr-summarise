@@ -1,3 +1,5 @@
+//Based on the algorithm proposed in "An O(ND) Difference Algorithm and its Variations" (Myers, 1986).
+
 const Diff = require('diff');
 
 function validateData(prrule,data) {

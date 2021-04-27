@@ -1,3 +1,4 @@
+//filling functions using ajax
 function getCardHtml(reponame,fullname, url, title, body, repo) {
     return `<div class="card mt-2 mb-2">
     <div class="card-header">
@@ -20,7 +21,7 @@ function moreInfo(data, fullname,reponame) {
         window.location.href = "/prinfo"
     });
 }
-
+//to get search results
 $("#pr_search").submit(function (event) {
     event.preventDefault();
     var search_url = "https://api.github.com/repos/" + $("#search_url").val() + "/pulls";
@@ -38,7 +39,7 @@ $("#pr_search").submit(function (event) {
         }
     })
 });
-
+//onloading
 window.onload = function(e){
     var html = localStorage.getItem("prs");
     document.getElementById('search_url').value = localStorage.getItem('search');

@@ -1,3 +1,4 @@
+//filling of data from backend using ajax
 function fillCode(data) {
     let htm = '';
     for (var i = 0; i < data.length; i++) {
@@ -35,7 +36,7 @@ function fillPkgAnalysis(unit) {
     })
     $("#pkgcheck").append(myhtm);
 }
-
+// function to start fetching
 function startFetch() {
     $.get('/prinfo/codeinfo', function (data) {
         fillCode(data);
@@ -44,5 +45,5 @@ function startFetch() {
         fillPkgAnalysis(data);
     });
 }
-
+//starting fetch
 startFetch();

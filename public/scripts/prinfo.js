@@ -1,3 +1,4 @@
+// displaying and filling functions
 function displayData(data){
     //setting up pr main card
     var body = data['body'];
@@ -44,7 +45,7 @@ function fillData(data){
     });
     $("#resval").append(myhtm);
 }
-
+//getting validation data
 function validateData(data){
     var thedata = {};
 	thedata.data = data;
@@ -52,7 +53,7 @@ function validateData(data){
         fillData(data);
     });
 }
-
+//get similarity data
 function fillSimilarity(data){
     var htm = `<b>Similarity with the guildelines: </b>${data*100} %`;
     $("#simval").html(htm);
@@ -65,7 +66,7 @@ function findSimilarity(data){
         fillSimilarity(data);
     });
 }
-
+//on loading
 $(window).on('load',function(){
     var prurl = $('#prurl').attr('href');
     $.get(prurl,function(data){

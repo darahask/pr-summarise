@@ -1,3 +1,4 @@
+// All Dependencies of the App
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -5,17 +6,17 @@ var configstore = require('configstore');
 var validate = require("./logic/validate");
 var axios = require('axios');
 var similarity = require('./logic/similarity');
-
+// Configuring the server(view-engine,rootpath,request-parser)
 app.set("view engine", "ejs");
 app.use("/", express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
-
+// Storage mechanism(cache)
 const store = new configstore("Pr-Summariz");
-
+//Routes
 app.get('/', function (req, res) {
     res.render("index");
 });
-
+//Routes corresponding to Pull-Request Info page
 app.post('/prinfo', function (req, res) {
     store.set('url', req.body.url);
     store.set('fullname', req.body.fullname);
@@ -26,18 +27,6 @@ app.post('/prinfo', function (req, res) {
 app.get('/prinfo', function (req, res) {
     var url = store.get('url');
     res.render('prinfo', { url: url });
-});
-
-app.get('/prrules', function (req, res) {
-    res.render('prrules');
-});
-
-app.post('/prrules', function (req, res) {
-    var prrule = req.body.prrule;
-    var cmrule = req.body.cmrule;
-    store.set('prrule', prrule);
-    store.set('pkgrule', cmrule);
-    res.redirect('/');
 });
 
 app.post('/prinfo/validate', (req, res) => {
@@ -95,7 +84,19 @@ app.get("/prinfo/pkgcheck", (req, res) => {
     })
     res.json(store.get('codedata'));
 });
+//Routes corresponding to storage of rules
+app.get('/prrules', function (req, res) {
+    res.render('prrules');
+});
 
+app.post('/prrules', function (req, res) {
+    var prrule = req.body.prrule;
+    var cmrule = req.body.cmrule;
+    store.set('prrule', prrule);
+    store.set('pkgrule', cmrule);
+    res.redirect('/');
+});
+//Listening port (loclhost:3000)
 app.listen(3000, function (req, res) {
     console.log("Server Started");
 });
