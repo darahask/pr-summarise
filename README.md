@@ -56,6 +56,7 @@ Please feel free to drop us your valuable feedback via email: cs18b007@iittp.ac.
 * Go to Root directory and run ```npm install --save```
 * Run using ```npm start``` by opening terminal in cloned root directory.
 * To view the website go to ```localhost:3000``` on your host pc
+* Extra.txt and pkgurl.txt has default values for prrules and package link and repo used is scorelab/LabelLab
 
 # Future Improvements
 * Generation of Pull-request Template from normal human written text and then comparing it will the rules and guidelines of repo.
