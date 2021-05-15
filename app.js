@@ -6,16 +6,20 @@ var configstore = require('configstore');
 var validate = require("./logic/validate");
 var axios = require('axios');
 var similarity = require('./logic/similarity');
+
 // Configuring the server(view-engine,rootpath,request-parser)
 app.set("view engine", "ejs");
 app.use("/", express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // Storage mechanism(cache)
 const store = new configstore("Pr-Summariz");
+
 //Routes
 app.get('/', function (req, res) {
     res.render("index");
 });
+
 //Routes corresponding to Pull-Request Info page
 app.post('/prinfo', function (req, res) {
     store.set('url', req.body.url);
@@ -61,34 +65,30 @@ app.get('/prinfo/codeinfo', (req, res) => {
 })
 
 app.get("/prinfo/pkgcheck", (req, res) => {
-    var codedata = [];
+    var promArr = [];
     var urls = store.get('pkgrule').split("\r\n");
-    console.log(urls);
     urls.forEach((url)=>{
         if(url === ''){
             return;
         }
         var baseurl = `https://raw.githubusercontent.com/${store.get('reponame')}/${url}`;
         var headurl = `https://raw.githubusercontent.com/${store.get('fullname')}/${url}`;
-        axios.get(baseurl).then(function (resp) {
-            var basefile = resp['data'].toString();
-            axios.get(headurl).then(function (resp2) {
-                var headfile = resp2['data'].toString();
-                var data = {}
-                data.validation = validate(basefile,{body:headfile});
-                data.similarity = similarity(basefile,{body:headfile});
-                data.path = url;
-                codedata.push(data);
-                store.set('codedata',codedata);
-                console.log('First')
-                console.log(store.get('codedata'));
-            }).catch((e)=>{console.log(e)});
-        }).catch((e)=>{console.log(e)});
+        promArr.push(axios.get(baseurl));
+        promArr.push(axios.get(headurl));
     })
-    console.log("Second")
-    console.log(store.get('codedata'));
-    res.json(store.get('codedata'));
+    Promise.all(promArr).then(function(values){
+        var codedata = [];
+        for(var i =0; i < values.length; i = i + 2){
+            var data = {}
+            data.validation = validate(values[i].data,{body:values[i+1].data});
+            data.similarity = similarity(values[i].data,{body:values[i+1].data});
+            data.path = values[i+1].request.path;
+            codedata.push(data);
+        }
+        res.json(codedata);
+    })
 });
+
 //Routes corresponding to storage of rules
 app.get('/prrules', function (req, res) {
     res.render('prrules');
@@ -101,6 +101,10 @@ app.post('/prrules', function (req, res) {
     store.set('pkgrule', cmrule);
     res.redirect('/');
 });
-//Listening port (loclhost:3000)
-app.listen(process.env.PORT,process.env.IP);
-// app.listen(3000);
+
+//Listening on port of localmachine on (localhost:3000)
+if(process.env.PORT){
+    app.listen(process.env.PORT,process.env.IP);
+}else{
+    app.listen(3000);
+}

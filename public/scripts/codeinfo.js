@@ -16,9 +16,7 @@ function fillCode(data) {
 }
 
 function fillPkgAnalysis(unit) {
-    console.log(unit);
     var myhtm = "";
-    console.log(unit);
     unit.forEach((data) => {
         myhtm += `<li class="list-group-item active" id='simcode'><b>Similarity with the guildelines: </b>${data.similarity * 100} %<br>
         <b>File Path: </b>${data.path}</li>`;
