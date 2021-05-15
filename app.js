@@ -63,25 +63,30 @@ app.get('/prinfo/codeinfo', (req, res) => {
 app.get("/prinfo/pkgcheck", (req, res) => {
     var codedata = [];
     var urls = store.get('pkgrule').split("\r\n");
+    console.log(urls);
     urls.forEach((url)=>{
         if(url === ''){
             return;
         }
-        var baseurl = `https://raw.githubusercontent.com/${store.get('reponame')}${url}`;
-        var headurl = `https://raw.githubusercontent.com/${store.get('fullname')}${url}`;
+        var baseurl = `https://raw.githubusercontent.com/${store.get('reponame')}/${url}`;
+        var headurl = `https://raw.githubusercontent.com/${store.get('fullname')}/${url}`;
         axios.get(baseurl).then(function (resp) {
             var basefile = resp['data'].toString();
             axios.get(headurl).then(function (resp2) {
                 var headfile = resp2['data'].toString();
                 var data = {}
-                data.validation = validate(headfile,{body:headfile});
+                data.validation = validate(basefile,{body:headfile});
                 data.similarity = similarity(basefile,{body:headfile});
                 data.path = url;
                 codedata.push(data);
                 store.set('codedata',codedata);
-            }).catch(()=>{});
-        }).catch(()=>{});
+                console.log('First')
+                console.log(store.get('codedata'));
+            }).catch((e)=>{console.log(e)});
+        }).catch((e)=>{console.log(e)});
     })
+    console.log("Second")
+    console.log(store.get('codedata'));
     res.json(store.get('codedata'));
 });
 //Routes corresponding to storage of rules
@@ -97,6 +102,5 @@ app.post('/prrules', function (req, res) {
     res.redirect('/');
 });
 //Listening port (loclhost:3000)
-app.listen(3000, function (req, res) {
-    console.log("Server Started");
-});
+app.listen(process.env.PORT,process.env.IP);
+// app.listen(3000);

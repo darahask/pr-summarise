@@ -1,1 +1,1 @@
-scorelab/LabelLab/master/labellab_mobile/pubspec.yaml
+master/labellab_mobile/pubspec.yaml
